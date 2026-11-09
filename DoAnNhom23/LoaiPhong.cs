@@ -1,0 +1,81 @@
+﻿namespace ConsoleApp1;
+
+public class LoaiPhong
+{
+    // Gia cuoi tuan tang 1.2%
+    private const decimal WeekendRate = 1.2m;
+
+    private decimal pricePerNight;
+    private int maxGuessts;
+    
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public decimal PricePerNight {
+        get{return pricePerNight;}
+        set
+        {
+            if (value < 0)
+                throw new ArgumentException("gia moi phong ko dc am.");
+            pricePerNight = value;
+        }
+    }
+    
+    public int MaxGuessts
+    {
+        get{return maxGuessts;}
+        set
+        {
+            if (value < 0)
+                throw new ArgumentException("so khach toi da pk > 0.");
+            maxGuessts = value;
+        }
+    }
+    
+    public LoaiPhong(){ }
+
+    public LoaiPhong(int id, string name, decimal pricePerNight, int maxGuessts, string amenities)
+    {
+        Id = id;
+        Name = name;
+        PricePerNight = pricePerNight;
+        MaxGuessts = maxGuessts;
+        Amenities = amenities;
+    }
+
+    public decimal GetPrice(DateTime date)
+    {
+        if(IsWeekend(date)) 
+            return pricePerNight * WeekendRate;
+        
+        return pricePerNight;
+    }
+
+    public decimal CalculateTotal(DateTime CheckIn, DateTime CheckOut)
+    {
+        if (CheckOut.Date <= CheckIn.Date)
+            throw new ArgumentException("Ngay tra phai sau ngay nhan.");
+        
+        decimal total = 0;
+        for (DateTime d = CheckIn.Date; d < CheckOut.Date; d.AddDays(1))
+        {
+            total += GetPrice(d);
+        }
+        return total;
+    }
+
+    public bool CanAccommodate(int guestCount)
+    {
+        return guestCount > 0 && guestCount <= maxGuessts;
+    }
+
+    public bool IsWeekend(DateTime date)
+    {
+        DayOfWeek day = date.DayOfWeek;
+        return day == DayOfWeek.Friday || day == DayOfWeek.Saturday || day == DayOfWeek.Sunday;
+    }
+
+    public override string ToString()
+    {
+        return $"{Name} - {pricePerNight:N00}dong";
+    }
+}
