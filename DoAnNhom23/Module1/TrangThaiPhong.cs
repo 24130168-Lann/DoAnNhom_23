@@ -1,4 +1,4 @@
-﻿namespace ConsoleApp1;
+﻿namespace DoAnNhom23;
 
 public enum TrangThaiPhong
 {

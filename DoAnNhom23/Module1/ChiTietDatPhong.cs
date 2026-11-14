@@ -1,19 +1,34 @@
 namespace DoAnNhom23;
 //Nguyễn Thị Hoài Lan
-//Chi tie
+//một phòng trong 1 đặt phòng (dòng phòng)
 public class ChiTietDatPhong
 {
-    public int Id { get; set; }
-    public LoaiPhong LoaiPhong { get; set; }
-    public Phong? Phong  { get; set; }
-    public decimal  GiaMoiDem { get; set; }
+    public int id { get; set; }
+    public int DatPhongId { get; set; }
 
-    public ChiTietDatPhong(int Id, loaiPhong loaiPhong, decimal giaMoiDem)
-    {
-        this.Id = Id;
-        this.LoaiPhong = loaiPhong;
-        this.GiaMoiDem = giaMoiDem;
-        Phong = null;
-    }
-    
+    public LoaiPhong loaiPhong { get; set; }
+
+    //để trống cho đến khi gán phòng cụ thể
+    public int? PhongId { get; set; }
+
+    //giá lưu lúc đặt
+    public long GiaMoiDem { get; set; }
+    public long GiaMoiGio { get; set; }
+    public DateTime? CheckinThucTe { get; set; }
+
+    public DateTime? CheckoutThucTe { get; set; }
+
+    //chốt lúc checkout (nằm ở module 2), trống trước đó
+    public long? TienPhong { get; set; }
+
+    public long? TienDichVu { get; set; }
+
+    //đã checkin
+    public bool DaCheckin => CheckinThucTe.HasValue;
+
+    //đã checkout
+    public bool DaCheckout => CheckoutThucTe.HasValue;
+    //đang ở: đã checkin chứ chưa checkout
+    public bool DangO => DaCheckin && DaCheckout;
 }
+
