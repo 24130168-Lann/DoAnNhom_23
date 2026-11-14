@@ -1,5 +1,6 @@
 namespace DoAnNhom23;
-
+//Nguyễn Thị Hoài Lan
+//Chi tie
 public class ChiTietDatPhong
 {
     public int Id { get; set; }
