@@ -9,6 +9,6 @@ public enum TrangThaiDatPhong
             //nếu 1 trong các phòng trong đơn đã checkout rồi nhưng các phòng 
             //còn lại chưa checkout thì cái đặt phòng đó vẫn là DANG_O
             //tuy nhiên không phải là phòng đã checkout đó đang ở trạng thái DANG_O
-    DA_TRA, //DA_TRA: mọi phòng đã check-out
+    DA_TRA, //DA_TRA: mọi phòng đã check-out 
     DA_HUY
 }
