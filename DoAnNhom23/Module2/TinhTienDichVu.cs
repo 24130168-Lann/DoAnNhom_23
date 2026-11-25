@@ -1,12 +1,12 @@
 ﻿namespace DoAnNhom23.Module2;
 
-// Một dòng dịch vụ đã gọi (DV-02)
+// một dòng dịch vụ đã gọi dùng để tính tiền
 public class DongDichVu
 {
     public string TenDichVu { get; set; } = string.Empty;
     public int SoLuong { get; set; }
     public long DonGia { get; set; }
-    // xóa mềm (da_xoa): dòng đã xóa không tính tiền nhưng vẫn được giữ để kiểm toán (DV-05)
+    // xóa mềm: dòng đã xóa không được tính tiền (DV-05)
     public bool DaXoa { get; set; }
 
     public DongDichVu() { }
@@ -19,30 +19,16 @@ public class DongDichVu
         DaXoa = daXoa;
     }
 
-    // thành tiền = so_luong x don_gia (DV-03)
     public long ThanhTien => checked((long)SoLuong * DonGia);
 }
 
-// tổng tiền dịch vụ của một dòng phòng (DV-08)
+// tổng tiền dịch vụ của một phòng (DV-03, DV-08)
 public class TinhTienDichVu
 {
-    // GC-8: số lượng là số nguyên từ 1-99. schema CHECK so_luong BETWEEN 1 AND 99
     public const int SoLuongToiThieu = 1;
-    public const int SoLuongToiDa = 99;
-
-    // ghi chú xóa  tối đa 200 ký tự sau khi trim
+    public const int SoLuongToiDa = 99;   // GC-8
     public const int GhiChuXoaToiDa = 200;
-    // số lượng dịch vụ
-    public static bool SoLuongHopLe(int soLuong) => soLuong >= SoLuongToiThieu && soLuong <= SoLuongToiDa;
 
-    public static bool GhiChuXoaHopLe(string? ghiChu)
-    {
-        if (ghiChu is null) return false;
-        int doDai = ghiChu.Trim().Length;
-        return doDai >= 1 && doDai <= GhiChuXoaToiDa;
-    }
-
-    // tổng thành tiền các dòng chưa xoá, bỏ qua dòng xoá mềm
     public static long Tinh(IEnumerable<DongDichVu> cacDong)
     {
         ArgumentNullException.ThrowIfNull(cacDong);
@@ -51,15 +37,33 @@ public class TinhTienDichVu
         {
             if (dong.DaXoa) continue;
 
-            if (!SoLuongHopLe(dong.SoLuong))
-                throw new ArgumentException(
-                    $"Số lượng phải là số nguyên từ {SoLuongToiThieu} đến {SoLuongToiDa} (dịch vụ \"{dong.TenDichVu}\", số lượng {dong.SoLuong})");
+            KiemTraSoLuong(dong.SoLuong, dong.TenDichVu);
             if (dong.DonGia < 0)
-                throw new ArgumentException(
-                    $"Đơn giá không được âm (dịch vụ \"{dong.TenDichVu}\", đơn giá {dong.DonGia})");
+                throw new ArgumentException($"Đơn giá không được âm (dịch vụ \"{dong.TenDichVu}\", đơn giá {dong.DonGia})");
             tong = checked(tong + dong.ThanhTien);
         }
 
         return tong;
+    }
+
+    // số lượng là số nguyên từ 1 đến 99 (GC-8)
+    public static void KiemTraSoLuong(int soLuong, string tenDichVu = "")
+    {
+        if (soLuong < SoLuongToiThieu || soLuong > SoLuongToiDa)
+            throw new ArgumentException(
+                $"Số lượng phải là số nguyên từ {SoLuongToiThieu} đến {SoLuongToiDa} (dịch vụ \"{tenDichVu}\", số lượng {soLuong})");
+    }
+
+    public static long TinhThanhTien(int soLuong, long donGia) => checked((long)soLuong * donGia);
+
+    // ghi chú xóa bắt buộc, không rỗng, tối đa 200 ký tự sau khi trim 
+    public static string ChuanHoaGhiChuXoa(string? ghiChu)
+    {
+        var sach = ghiChu?.Trim() ?? string.Empty;
+        if (sach.Length == 0)
+            throw new ArgumentException("Ghi chú xóa là bắt buộc", nameof(ghiChu));
+        if (sach.Length > GhiChuXoaToiDa)
+            throw new ArgumentException($"Ghi chú xóa tối đa {GhiChuXoaToiDa} ký tự", nameof(ghiChu));
+        return sach;
     }
 }
