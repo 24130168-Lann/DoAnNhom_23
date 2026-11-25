@@ -2,6 +2,6 @@
 //Loại giấy tờ tùy thân của khách (DP-04, DP-06)
 public enum LoaiGiayTo
 {
-    Cccd, //đúng 12 chữ số
-    HoChieu //6 đến 12 ký tự chữ số
+    CCCD, //đúng 12 chữ số
+    HO_CHIEU //6 đến 12 ký tự chữ số
 }

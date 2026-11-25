@@ -6,7 +6,7 @@ public class ChiTietDatPhong
     public int id { get; set; }
     public int DatPhongId { get; set; }
 
-    public LoaiPhong loaiPhong { get; set; }
+    public LoaiPhong LoaiPhongId { get; set; }
 
     //để trống cho đến khi gán phòng cụ thể
     public int? PhongId { get; set; }
@@ -17,7 +17,7 @@ public class ChiTietDatPhong
     public DateTime? CheckinThucTe { get; set; }
 
     public DateTime? CheckoutThucTe { get; set; }
-
+    public DateTime? HuyLuc { get; set; }
     //chốt lúc checkout (nằm ở module 2), trống trước đó
     public long? TienPhong { get; set; }
 
