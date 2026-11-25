@@ -165,7 +165,16 @@ SELECT 'nhanvien_du_lieu_mau', 'SEED_ONLY_NOT_FOR_LOGIN', 'NHAN_VIEN', 1
 WHERE NOT EXISTS (
     SELECT 1 FROM TAI_KHOAN WHERE ten_dang_nhap = 'nhanvien_du_lieu_mau'
 );
-
+-- 8 khach hang dau tien (phai chay truoc 16 khach ben duoi de id la 1 den 8).
+INSERT OR IGNORE INTO KHACH_HANG (ho_ten, so_dien_thoai, loai_giay_to, so_giay_to) VALUES
+                                                                                       ('Nguyễn Minh Anh', '0900000001', 'CCCD', '079000000001'),
+                                                                                       ('Trần Quốc Bảo', '0900000002', 'CCCD', '079000000002'),
+                                                                                       ('Lê Thu Hà', '0900000003', 'CCCD', '079000000003'),
+                                                                                       ('Phạm Gia Huy', '0900000004', 'CCCD', '079000000004'),
+                                                                                       ('Võ Ngọc Linh', '0900000005', 'CCCD', '079000000005'),
+                                                                                       ('Đặng Hoàng Nam', '0900000006', 'CCCD', '079000000006'),
+                                                                                       ('Bùi Khánh Vy', '0900000007', 'CCCD', '079000000007'),
+                                                                                       ('Đỗ Thành Đạt', '0900000008', 'CCCD', '079000000008');
 -- Bo sung 16 khach hang, tong cong 24 khach hang mau.
 
 INSERT OR IGNORE INTO KHACH_HANG (ho_ten, so_dien_thoai, loai_giay_to, so_giay_to) VALUES ('Nguyễn Đức Minh', '0900000009', 'CCCD', '079000000009');

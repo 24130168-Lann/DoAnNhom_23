@@ -12,9 +12,13 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="Data\schema.sql">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
+        <None Update="Data\*.sql">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Data\QuanLyKhachSan.db">
+          <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
+   
 
 </Project>

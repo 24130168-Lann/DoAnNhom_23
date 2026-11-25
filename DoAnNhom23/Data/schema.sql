@@ -696,7 +696,7 @@ BEGIN
         (SELECT trang_thai FROM DAT_PHONG WHERE id = NEW.dat_phong_id) <> 'DANG_O' OR
         NEW.phong_id IS NULL OR
         datetime(NEW.checkin_thuc_te) < datetime((SELECT ngay_den FROM DAT_PHONG WHERE id = NEW.dat_phong_id)) OR
-        datetime(NEW.checkin_thuc_te) >= datetime((SELECT ngay_di FROM DAT_PHONG WHERE id = NEW.dat_phong_id)) OR
+        date(NEW.checkin_thuc_te) >= datetime((SELECT ngay_di FROM DAT_PHONG WHERE id = NEW.dat_phong_id)) OR
         EXISTS (SELECT 1 FROM PHONG p WHERE p.id = NEW.phong_id AND p.can_don_dep = 1)
         )
                     THEN RAISE(ABORT, 'Dong check-in moi phai thuoc DANG_O, dung phong va trong khoang hop le') END;
@@ -775,7 +775,7 @@ BEGIN
         SELECT 1 FROM PHONG p WHERE p.id = NEW.phong_id AND p.loai_phong_id = NEW.loai_phong_id AND p.can_don_dep = 0
     )
                     THEN RAISE(ABORT, 'Phong khong dung loai hoac dang don dep') END;
-    SELECT CASE WHEN datetime(NEW.checkin_thuc_te) < datetime((SELECT ngay_den FROM DAT_PHONG WHERE id = NEW.dat_phong_id))
+    SELECT CASE WHEN date(NEW.checkin_thuc_te) < date((SELECT ngay_den FROM DAT_PHONG WHERE id = NEW.dat_phong_id))
         OR datetime(NEW.checkin_thuc_te) >= datetime((SELECT ngay_di FROM DAT_PHONG WHERE id = NEW.dat_phong_id))
                     THEN RAISE(ABORT, 'Thoi diem check-in nam ngoai khoang DAT_PHONG') END;
 END;
