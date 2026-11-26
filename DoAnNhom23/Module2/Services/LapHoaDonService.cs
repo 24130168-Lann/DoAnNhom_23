@@ -1,78 +1,11 @@
-﻿namespace DoAnNhom23.Module2;
+﻿using DoAnNhom23.Module2.Enums;
+using DoAnNhom23.Module2.Exceptions;
+using DoAnNhom23.Module2.Models;
+using DoAnNhom23.Module2.Results;
 
-// có 2 trạng thái: CHO_THANH_TOAN, DA_THANH_TOAN
-// hoàn cọc dư xử lý ngay khi lập hóa đơn
-public enum TrangThaiHoaDon
-{
-    CHO_THANH_TOAN,
-    DA_THANH_TOAN
-}
+namespace DoAnNhom23.Module2.Services;
 
-// Lệnh hoàn cọc dư mô phỏng, ghi lên DAT_PHONG trước khi INSERT HOA_DON (HD-07)
-public record LenhHoanCoc(
-    string MaHoanCoc,
-    long SoTien,
-    DateTime ThoiDiem,
-    string NoiDung,
-    string TkHoanTen,
-    string TkHoanSo,
-    string TkHoanNganHang);
-
-// Ảnh chụp hóa đơn (HD-08: lập xong không sửa, không phụ thuộc giá hiện hành)
-public record KetQuaHoaDon(
-    string MaHoaDon,
-    string MaDatPhong,
-    DateTime ThoiDiemLap,
-    long TongTienPhong,
-    long TongTienDichVu,
-    long TongCong,
-    long CocGiuLai,          // tổng coc_giu_lai của các dòng NO_SHOW
-    long TienCocConLai,      // tien_coc - coc_giu_lai (cọc khả dụng)
-    long TienCocCanTru,      // cọc thực tế cấn trừ = MIN(tong_cong, tien_coc_con_lai)
-    long SoTienConLai,       // có dấu: dương = khách trả, 0 = tất toán, âm = hoàn cọc dư
-    long SoTienHoan,         // MAX(0, -so_tien_con_lai)
-    TrangThaiHoaDon TrangThai,
-    DateTime? ThoiDiemThanhToan,
-    LenhHoanCoc? LenhHoan)
-{
-    // Khách còn phải trả bao nhiêu (0 nếu tiền cọc = tiền phải trả => không có dư)
-    public long SoTienPhaiTra => Math.Max(0, SoTienConLai);
-
-    // Chỉ có nút thanh toán/QR khi CHO_THANH_TOAN và còn dương (CO-05)
-    public bool CanThanhToan => TrangThai == TrangThaiHoaDon.CHO_THANH_TOAN && SoTienConLai > 0;
-}
-
-// chỉ đọc, đủ để quyết định và tính hóa đơn
-public record DatPhongTinhHoaDon(
-    string MaDatPhong,
-    string TenNguoiDat,
-    TrangThaiDatPhong TrangThai,
-    bool VangLai,
-    long TienCoc,
-    bool DaCoHoaDon,
-    IReadOnlyList<DongPhongTinhHoaDon> CacDong,
-    string? TkHoanTen = null,
-    string? TkHoanSo = null,
-    string? TkHoanNganHang = null);
-
-public enum LyDoChuaLapHoaDon
-{
-    KhongCo,                   // đủ điều kiện
-    DaCoHoaDon,                // đã có hóa đơn: trả hóa đơn hiện có, không lập thêm
-    DatPhongKhongDangO,
-    KhongCoDongNaoCheckin,     // thuộc nhánh DA_HUY của Module 1, không lập hóa đơn
-    CoDongChuaKetThuc          // còn dòng DANG_O hoặc CHUA_NHAN chưa được Module 1 xử lý no-show
-}
-
-public record DieuKienLapHoaDon(
-    bool DuDieuKien,
-    LyDoChuaLapHoaDon LyDo,
-    IReadOnlyList<int> DongDangO,
-    IReadOnlyList<int> DongChuaNhan);
-
-// CO-04: logic thuần, không ghi DB. Application Service gọi sau CO-03 và sau sự kiện DP-09 (HD-10),
-// rồi ghi lệnh hoàn (nếu có) -> INSERT HOA_DON -> đặt phòng DA_TRA trong cùng một transaction (HD-11)
-public static class LapHoaDon
+public static class LapHoaDonService
 {
     private static readonly IReadOnlyList<int> Rong = Array.Empty<int>();
 
@@ -108,7 +41,7 @@ public static class LapHoaDon
 
         return new DieuKienLapHoaDon(true, LyDoChuaLapHoaDon.KhongCo, Rong, Rong);
     }
-        //điều kiện cho lập hoá đơn 
+
     public static string MoTaLyDo(DieuKienLapHoaDon dk) => dk.LyDo switch
     {
         LyDoChuaLapHoaDon.KhongCo => "Đủ điều kiện lập hóa đơn.",
@@ -162,7 +95,7 @@ public static class LapHoaDon
         long tienCocCanTru = Math.Min(tongCong, tienCocConLai);
         long soTienHoan = Math.Max(0, -soTienConLai);
 
-        // HD-04: >0 chờ thanh toán; <=0 đã tất toán ngay khi lập (thoi_diem_thanh_toan để NULL theo CHECK của HOA_DON)
+        // HD-04: >0 chờ thanh toán; <=0 đã tất toán ngay khi lập 
         var trangThai = soTienConLai > 0 ? TrangThaiHoaDon.CHO_THANH_TOAN : TrangThaiHoaDon.DA_THANH_TOAN;
         var lenhHoan = soTienHoan > 0 ? TaoLenhHoan(dat, soTienHoan, thoiDiemLap) : null;
 
@@ -183,7 +116,7 @@ public static class LapHoaDon
             LenhHoan: lenhHoan);
     }
 
-    // HD-07: đúng một lệnh hoàn cho mỗi đặt phòng; mã xác định theo mã đặt phòng không retry
+    // HD-07: đúng một lệnh hoàn cho mỗi đặt phòng; mã xác định theo mã đặt phòng nên retry không sinh mã mới
     private static LenhHoanCoc TaoLenhHoan(DatPhongTinhHoaDon dat, long soTienHoan, DateTime thoiDiem)
     {
         if (string.IsNullOrWhiteSpace(dat.TkHoanTen) || string.IsNullOrWhiteSpace(dat.TkHoanSo)

@@ -1,29 +1,9 @@
-﻿namespace DoAnNhom23.Module2;
+﻿using DoAnNhom23.Module2.Models;
 
-// một dòng dịch vụ đã gọi dùng để tính tiền
-public class DongDichVu
-{
-    public string TenDichVu { get; set; } = string.Empty;
-    public int SoLuong { get; set; }
-    public long DonGia { get; set; }
-    // xóa mềm: dòng đã xóa không được tính tiền (DV-05)
-    public bool DaXoa { get; set; }
+namespace DoAnNhom23.Module2.Services;
 
-    public DongDichVu() { }
-
-    public DongDichVu(string tenDichVu, int soLuong, long donGia, bool daXoa = false)
-    {
-        TenDichVu = tenDichVu;
-        SoLuong = soLuong;
-        DonGia = donGia;
-        DaXoa = daXoa;
-    }
-
-    public long ThanhTien => checked((long)SoLuong * DonGia);
-}
-
-// tổng tiền dịch vụ của một phòng (DV-03, DV-08)
-public class TinhTienDichVu
+// Tổng tiền dịch vụ của một phòng (DV-03, DV-08)
+public static class TinhTienDichVuService
 {
     public const int SoLuongToiThieu = 1;
     public const int SoLuongToiDa = 99;   // GC-8
@@ -56,7 +36,7 @@ public class TinhTienDichVu
 
     public static long TinhThanhTien(int soLuong, long donGia) => checked((long)soLuong * donGia);
 
-    // ghi chú xóa bắt buộc, không rỗng, tối đa 200 ký tự sau khi trim 
+    // ghi chú xóa bắt buộc, không rỗng, tối đa 200 ký tự sau khi trim
     public static string ChuanHoaGhiChuXoa(string? ghiChu)
     {
         var sach = ghiChu?.Trim() ?? string.Empty;

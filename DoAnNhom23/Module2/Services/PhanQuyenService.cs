@@ -1,25 +1,12 @@
-﻿namespace DoAnNhom23.Module2;
+﻿using DoAnNhom23.Module2.Enums;
 
-public enum VaiTro { Khach, NhanVien, Chu }
+namespace DoAnNhom23.Module2.Services;
 
-// CO-04 (lập hóa đơn) là tự động theo HD-01 nên không có quyền thao tác thủ công
-public enum ChucNang
-{
-    CO01_GoiDichVu,
-    CO02_XemDichVu,
-    CO02_XoaDichVu,
-    CO03_TraPhong,
-    CO05_ThanhToan,
-    CO06_XemInHoaDon,
-    CO07_DonXongSom,
-    CO08_HoaDonChuaThanhToan
-}
-
-public static class PhanQuyen
+public static class PhanQuyenService
 {
     public static bool ChoPhep(VaiTro vaiTro, ChucNang chucNang)
     {
-        bool nhanVienHoacChu = vaiTro is VaiTro.NhanVien or VaiTro.Chu;
+        bool nhanVienHoacChu = vaiTro is VaiTro.NHAN_VIEN or VaiTro.CHU;
         return chucNang switch
         {
             // khách được dùng (sau khi xác thực AC-01, trên đặt phòng của mình)
@@ -32,5 +19,5 @@ public static class PhanQuyen
 
     // Khách chỉ được thao tác trên đặt phòng của mình sau khi xác thực AC-01
     public static bool ChoPhepTrenDatPhong(VaiTro vaiTro, ChucNang chucNang, bool khachDaXacThucDungDatPhong)
-        => ChoPhep(vaiTro, chucNang) && (vaiTro != VaiTro.Khach || khachDaXacThucDungDatPhong);
+        => ChoPhep(vaiTro, chucNang) && (vaiTro != VaiTro.KHACH || khachDaXacThucDungDatPhong);
 }
