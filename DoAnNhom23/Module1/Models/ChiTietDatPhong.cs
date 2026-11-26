@@ -3,13 +3,13 @@ namespace DoAnNhom23;
 //một phòng trong 1 đặt phòng (dòng phòng)
 public class ChiTietDatPhong
 {
-    public int id { get; set; }
-    public int DatPhongId { get; set; }
+    public long Id { get; set; }
+    public long DatPhongId { get; set; }
 
-    public LoaiPhong LoaiPhongId { get; set; }
+    public long LoaiPhongId { get; set; }
 
     //để trống cho đến khi gán phòng cụ thể
-    public int? PhongId { get; set; }
+    public long? PhongId { get; set; }
 
     //giá lưu lúc đặt
     public long GiaMoiDem { get; set; }
@@ -18,17 +18,19 @@ public class ChiTietDatPhong
 
     public DateTime? CheckoutThucTe { get; set; }
     public DateTime? HuyLuc { get; set; }
+    public long CocGiuLai { get; set; }
     //chốt lúc checkout (nằm ở module 2), trống trước đó
     public long? TienPhong { get; set; }
 
     public long? TienDichVu { get; set; }
 
-    //đã checkin
-    public bool DaCheckin => CheckinThucTe.HasValue;
-
-    //đã checkout
-    public bool DaCheckout => CheckoutThucTe.HasValue;
-    //đang ở: đã checkin chứ chưa checkout
-    public bool DangO => DaCheckin && DaCheckout;
+    public TrangThaiDongPhong TrangThai()
+    {
+        if (HuyLuc != null) return TrangThaiDongPhong.NO_SHOW;
+        if (CheckinThucTe == null) return TrangThaiDongPhong.CHUA_NHAN;
+        if (CheckoutThucTe == null) return TrangThaiDongPhong.DANG_O;
+        return TrangThaiDongPhong.DA_TRA;
+    }
+    
 }
 

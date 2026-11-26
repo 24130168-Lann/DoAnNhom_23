@@ -6,8 +6,8 @@ namespace DoAnNhom23;
 public class DatPhongRepository
 {
     private const string CacCot =
-        @"id, ma_dat_phong, khach_hang_id, la_vang_lai, ngay_di, tien_coc, han_thanh_toan_coc, thoi_diem_coc, gio_giu_phong_den, trang_thai, ly_do_huy,
-                                thoi_diem_huy, ghi_chu_huy, tien_coc_hoan, ma_hoan_coc, thoi_diem_hoan_coc, tk_hoan_ten, tk_hoan_so, tk_hoan_ngan_han, noi_dung_hoan_coc";
+        @"id, ma_dat_phong, khach_hang_id, la_vang_lai, ngay_den, ngay_di, tien_coc, han_thanh_toan_coc, thoi_diem_coc, gio_giu_phong_den, trang_thai, ly_do_huy,
+                                thoi_diem_huy, ghi_chu_huy, tien_coc_hoan, ma_hoan_coc, thoi_diem_hoan_coc, tk_hoan_ten, tk_hoan_so, tk_hoan_ngan_hang, noi_dung_hoan_coc";
 
     public static List<DatPhong> LayTatCa(SqliteConnection conn)
     {

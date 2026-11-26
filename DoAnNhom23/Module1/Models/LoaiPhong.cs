@@ -1,9 +1,9 @@
-﻿namespace DoAnNhom23;
+﻿namespace DoAnNhom23.Models;
 
 public class LoaiPhong
 {
-    public int Id  { get; set; }
-    public string TenLoai { get; set; } = string.Empty;
+    public long Id  { get; set; }
+    public string TenLoai { get; set; } = "";
     public long GiaTheoGio { get; set; }
     public long GiaTheoNgay  { get; set; } //giá 1 đêm
 }
