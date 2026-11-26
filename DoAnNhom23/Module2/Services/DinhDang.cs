@@ -1,14 +1,14 @@
 ﻿using System.Globalization;
 using System.Text;
 
-namespace DoAnNhom23.Module2;
+namespace DoAnNhom23.Module2.Services;
 
 // Hàm định dạng dùng chung trong Module 2
 internal static class DinhDang
 {
     public static string Tien(long soTien)
         => soTien.ToString("N0", CultureInfo.InvariantCulture).Replace(',', '.');
-    
+
     public static string BoDauVietHoa(string chuoi)
     {
         var phanTach = chuoi.Normalize(NormalizationForm.FormD);

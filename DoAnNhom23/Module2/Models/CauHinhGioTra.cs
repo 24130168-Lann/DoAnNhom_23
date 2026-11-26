@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace DoAnNhom23.Module2;
+namespace DoAnNhom23.Module2.Models;
 
 // Cấu hình giờ trả chuẩn (định dạng HH:mm, mặc định 12:00)
 public record CauHinhGioTra(TimeSpan GioTraChuan, int? SoGioTreToiDa = null, int? SoGioThueTheoGioToiDa = null)

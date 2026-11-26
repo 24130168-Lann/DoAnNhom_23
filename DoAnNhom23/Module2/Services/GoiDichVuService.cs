@@ -1,19 +1,10 @@
-﻿namespace DoAnNhom23.Module2;
+﻿using DoAnNhom23.Module2.Enums;
+using DoAnNhom23.Module2.Results;
 
-// Yêu cầu gọi một dịch vụ
-public record YeuCauGoiDichVu(int DichVuId, string Ten, string? DonVi, long DonGiaHienHanh, bool DangBan, int SoLuong);
-
-// Dòng dịch vụ sẽ được lưu: tên, đơn vị, đơn giá là bản chụp lúc gọi (DV-02)
-public record DongDichVuDaGoi(int DichVuId, string TenLucGoi, string? DonViLucGoi, int SoLuong, long DonGia,
-    DateTime ThoiDiem, int TaiKhoanId)
-{
-    public long ThanhTien => TinhTienDichVu.TinhThanhTien(SoLuong, DonGia);
-}
-
-public record KetQuaGoiDichVu(IReadOnlyList<DongDichVuDaGoi> CacDong, long Tong);
+namespace DoAnNhom23.Module2.Services;
 
 // CO-01 và CO-02: kiểm tra nghiệp vụ gọi / xóa mềm dịch vụ
-public static class GoiDichVu
+public static class GoiDichVuService
 {
     // CO-01: tất cả dòng hợp lệ mới lưu, không lưu một phần
     public static KetQuaGoiDichVu Tao(
@@ -26,8 +17,8 @@ public static class GoiDichVu
     {
         ArgumentNullException.ThrowIfNull(yeuCau);
 
-        if (!PhanQuyen.ChoPhep(vaiTro, ChucNang.CO01_GoiDichVu))
-            throw new UnauthorizedAccessException("Chỉ Nhân viên/CHủ được ghi nhận dịch vụ; khách hãy yêu cầu nhân viên.");
+        if (!PhanQuyenService.ChoPhep(vaiTro, ChucNang.CO01_GoiDichVu))
+            throw new UnauthorizedAccessException("Chỉ Nhân viên/Chủ được ghi nhận dịch vụ; khách hãy yêu cầu nhân viên.");
         if (taiKhoanId is not int taiKhoan || !taiKhoanDangHoatDong)
             throw new UnauthorizedAccessException("Cần tài khoản Nhân viên/Chủ đang hoạt động để ghi nhận dịch vụ.");
 
@@ -45,7 +36,7 @@ public static class GoiDichVu
         {
             if (!y.DangBan)
                 throw new InvalidOperationException($"Dịch vụ \"{y.Ten}\" đã ngừng bán.");
-            TinhTienDichVu.KiemTraSoLuong(y.SoLuong, y.Ten);
+            TinhTienDichVuService.KiemTraSoLuong(y.SoLuong, y.Ten);
             if (y.DonGiaHienHanh < 0)
                 throw new ArgumentException($"Đơn giá dịch vụ \"{y.Ten}\" không được âm.");
 
@@ -63,13 +54,13 @@ public static class GoiDichVu
         bool dongDichVuDaXoa,
         string? ghiChu)
     {
-        if (!PhanQuyen.ChoPhep(vaiTro, ChucNang.CO02_XoaDichVu))
+        if (!PhanQuyenService.ChoPhep(vaiTro, ChucNang.CO02_XoaDichVu))
             throw new UnauthorizedAccessException("Chỉ Nhân viên/Chủ được xóa dòng dịch vụ.");
         // DV-07: sau check-out tiền đã chốt, không xóa/sửa
         if (trangThaiDongPhong != TrangThaiDongPhong.DANG_O)
             throw new InvalidOperationException("Dòng phòng không còn ở, tiền dịch vụ đã chốt nên không được xóa (DV-07).");
         if (dongDichVuDaXoa)
             throw new InvalidOperationException("Dòng dịch vụ này đã được xóa.");
-        return TinhTienDichVu.ChuanHoaGhiChuXoa(ghiChu);
+        return TinhTienDichVuService.ChuanHoaGhiChuXoa(ghiChu);
     }
 }

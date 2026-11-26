@@ -1,23 +1,10 @@
-namespace DoAnNhom23.Module2;
+using DoAnNhom23.Module2.Enums;
+using DoAnNhom23.Module2.Results;
 
-// Kết quả tính tiền phòng (TP-01 đến TP-07)
-public enum HinhThucThue
-{
-    TheoGio, // check-in va check-out cung ngay lich
-    TheoDem  // check-out khac ngay lich
-}
-public record KetQuaTienPhong(
-    long TienPhong,
-    HinhThucThue Hinhthuc,
-    int SoDem,      // số đêm tính tiền (0 nếu cùng ngày)
-    int SoGio,      // số giờ tính tiền (chỉ dùng cho nhánh cùng ngày)
-    int SoGioTre,   // số giờ trễ sau giờ trả chuẩn (chỉ dùng cho nhánh qua đêm)
-    long TienDem,   // tiền đêm (nhánh qua đêm)
-    long TienGio,   // tiền theo giờ (nhánh cùng ngày) hoặc phụ thu trễ (nhánh qua đêm)
-    string CachTinh
-    );
+namespace DoAnNhom23.Module2.Services;
 
-public class TinhTienPhong
+// TP-01 đến TP-07
+public static class TinhTienPhongService
 {
     // Giờ trả chuẩn mặc định 12:00 (CAU_HINH.gio_tra_chuan)
     public static readonly TimeSpan GioTraChuanMacDinh = new TimeSpan(12, 0, 0);
@@ -70,8 +57,8 @@ public class TinhTienPhong
             ? $"{soDem} đêm x {DinhDang.Tien(giaMoiDem)} + {soGioTre} giờ trễ x {DinhDang.Tien(giaMoiGio)} (trần một đêm {DinhDang.Tien(giaMoiDem)})"
             : $"{soDem} đêm x {DinhDang.Tien(giaMoiDem)}";
         // TP-07: tiền phòng = tiền cơ bản + phụ thu
-        return new KetQuaTienPhong(checked(tienDem + phuThu),Hinhthuc: HinhThucThue.TheoDem,
-        soDem, 0, soGioTre, tienDem, phuThu, cach);
+        return new KetQuaTienPhong(checked(tienDem + phuThu), Hinhthuc: HinhThucThue.TheoDem,
+            soDem, 0, soGioTre, tienDem, phuThu, cach);
     }
 
     // làm tròn lên theo giờ (không có thời gian ân hạn - GC-3)

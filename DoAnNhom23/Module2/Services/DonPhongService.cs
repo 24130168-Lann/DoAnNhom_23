@@ -1,10 +1,11 @@
-﻿namespace DoAnNhom23.Module2;
+﻿using DoAnNhom23.Module2.Enums;
+using DoAnNhom23.Module2.Exceptions;
+using DoAnNhom23.Module2.Results;
 
-// Trạng thái dọn của một phòng 
-public record TrangThaiDon(bool CanDonDep, DateTime? DonXongLuc);
+namespace DoAnNhom23.Module2.Services;
 
 // CO-07 / DN-01..DN-05: không dùng bộ đếm nền, tính đúng nhờ đồng bộ trước mọi thao tác liên quan phòng
-public static class DonPhong
+public static class DonPhongService
 {
     // DN-05: can_don_dep = true <=> don_xong_luc có giá trị
     public static void KiemTraBatBien(bool canDonDep, DateTime? donXongLuc)
@@ -39,7 +40,7 @@ public static class DonPhong
     // DN-03: Nhân viên/Chủ xác nhận dọn xong sớm, chỉ khi phòng còn đang dọn (sau khi đồng bộ)
     public static TrangThaiDon XacNhanDonXongSom(VaiTro vaiTro, bool canDonDep, DateTime? donXongLuc, DateTime hienTai)
     {
-        if (!PhanQuyen.ChoPhep(vaiTro, ChucNang.CO07_DonXongSom))
+        if (!PhanQuyenService.ChoPhep(vaiTro, ChucNang.CO07_DonXongSom))
             throw new UnauthorizedAccessException("Chỉ Nhân viên/Chủ được xác nhận dọn xong sớm.");
         var hienTrang = DongBo(canDonDep, donXongLuc, hienTai);
         if (!hienTrang.CanDonDep)

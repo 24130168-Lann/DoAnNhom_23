@@ -1,12 +1,12 @@
-﻿namespace DoAnNhom23.Module2;
+﻿using DoAnNhom23.Module2.Enums;
+using DoAnNhom23.Module2.Results;
 
-// Kết quả mô phỏng thanh toán; GhiNhanMoi = false nghĩa là đã xử lý trước đó (idempotent)
-public record KetQuaThanhToan(KetQuaHoaDon HoaDon, bool GhiNhanMoi);
+namespace DoAnNhom23.Module2.Services;
 
-// CO-05 (thanh toán ) và CO-08 (danh sách hóa đơn chưa thanh toán)
-public static class ThanhToanHoaDon
+// CO-05 (thanh toán) và CO-08 (danh sách hóa đơn chưa thanh toán)
+public static class ThanhToanHoaDonService
 {
-    // hệ thống tự lấy so_tien_con_lai. Gọi lại / bấm lặp không ghi nhận lần hai.
+    // Hệ thống tự lấy so_tien_con_lai. Gọi lại / bấm lặp không ghi nhận lần hai.
     public static KetQuaThanhToan MoPhongThanhToan(KetQuaHoaDon hoaDon, DateTime thoiDiem)
     {
         ArgumentNullException.ThrowIfNull(hoaDon);

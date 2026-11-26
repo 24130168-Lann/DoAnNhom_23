@@ -1,16 +1,10 @@
-﻿namespace DoAnNhom23.Module2;
+﻿using DoAnNhom23.Module2.Models;
+using DoAnNhom23.Module2.Results;
 
-// Kết quả tính khi trả phòng (CO-03)
-public record KetQuaTraPhong(
-    DateTime CheckoutThucTe,
-    KetQuaTienPhong TienPhong,
-    long TienDichVu,
-    DateTime DonXongLuc)   // DN-01: checkout_thuc_te + thoi_gian_don_phut; phòng chuyển vàng (can_don_dep = true)
-{
-    public long TongTien => checked(TienPhong.TienPhong + TienDichVu);
-}
+namespace DoAnNhom23.Module2.Services;
 
-public static class TraPhong
+// CO-03: check-out một dòng phòng
+public static class TraPhongService
 {
     public const int ThoiGianDonMacDinhPhut = 30;
 
@@ -24,6 +18,7 @@ public static class TraPhong
         if (!checkinThucTe.HasValue)
             throw new InvalidOperationException("Dòng phòng chưa check-in, không thể trả phòng.");
     }
+
     // Giá phòng lấy từ giá đã chụp ở CHI_TIET_DAT_PHONG (TP-05)
     public static KetQuaTraPhong Tinh(
         DateTime? checkinThucTe,
@@ -44,9 +39,9 @@ public static class TraPhong
         cauHinh ??= CauHinhGioTra.MacDinh;
         cauHinh.KiemTra();
 
-        var tienPhong = TinhTienPhong.Tinh(checkinThucTe!.Value, thoiDiem, giaMoiDem, giaMoiGio, cauHinh.GioTraChuan);
-        long tienDichVu = TinhTienDichVu.Tinh(dichVu);
-        var don = DonPhong.BatDau(thoiDiem, thoiGianDonPhut);
+        var tienPhong = TinhTienPhongService.Tinh(checkinThucTe!.Value, thoiDiem, giaMoiDem, giaMoiGio, cauHinh.GioTraChuan);
+        long tienDichVu = TinhTienDichVuService.Tinh(dichVu);
+        var don = DonPhongService.BatDau(thoiDiem, thoiGianDonPhut);
 
         return new KetQuaTraPhong(thoiDiem, tienPhong, tienDichVu, don.DonXongLuc!.Value);
     }
