@@ -23,7 +23,6 @@ public sealed class TinhCongSuat
         var canhBao = new List<CanhBao>();
         var soPhong = Nguon.Phongs.Count;
         var cacThang = new List<KetQuaCongSuatThang>(12);
-        var soDongLoai = 0;
         var tongGioKhach = 0d;
         var tongGioDanhNghia = 0d;
 
@@ -36,11 +35,11 @@ public sealed class TinhCongSuat
                 continue;
             }
 
-            var gioCoKhach = TinhGioCoKhach(ky, canhBao, out soDongLoai);
+            var gioCoKhach = TinhGioCoKhach(ky);
             var gioDanhNghia = TinhGioDanhNghia(ky);
 
             // 
-            double? congSuat = gioDanhNghia ? 0d ? gioCoKhach / gioDanhNghia * 100d : null;
+            double? congSuat = gioDanhNghia > 0d ? gioCoKhach / gioDanhNghia * 100d : null;
 
             cacThang.Add(new KetQuaCongSuatThang
             {
@@ -59,9 +58,9 @@ public sealed class TinhCongSuat
         var mucThamChieu = TinhMucThamChieu(canhBao);
 
         //
-        double? CongSuatNam = tongGioDanhNghia > 0d ? tongGioKhach / tongGioDanhNghia * 100 : null;
+        double? congSuatNam = tongGioDanhNghia > 0d ? tongGioKhach / tongGioDanhNghia * 100 : null;
 
-        var ketQua = new KetQuaCongSuat()
+        var ketQua = new KetQuaCongSuat
         {
             Nam = nam,
             ThoiDiemBaoCao = thoiDiemBaoCao,
@@ -84,49 +83,57 @@ public sealed class TinhCongSuat
         return ketQua;
     }
 
-    //
-    public double TinhGioCoKhach(KyThang ky, List<CanhBao> canhBao, out in soDongLoai)
+    //Dem cac dong phong bi loai(timestamp sai) có liên quan đến năm ssang xem, dong thoi ghi cảnh báo
+    public int DemDongBiLoai(int nam, List<CanhBao> canhBao)
     {
         var thoiDiemBaoCao = Nguon.ThoiDiemBaoCao;
-        var tong = 0d;
-        var loai = 0;
+        var dem = 0;
 
         foreach (var dong in Nguon.TatCaDong())
         {
             var lyDo = KiemTraDongPhong.LyDoKhongHopLe(dong, thoiDiemBaoCao);
-            if (lyDo is not null)
-            {
-                if (KiemTraDongPhong.LienQuanDenNam(dong, ky.Nam, thoiDiemBaoCao))
-                {
+            if (lyDo is not null || !KiemTraDongPhong.LienQuanDenNam(dong, nam, thoiDiemBaoCao))
+            { 
+                continue; 
+            }
 
-                    loai++;
-                    canhBao.ThemDuyNhat(KiemTraDongPhong.TaoCanhBao(dong, lyDo));
-                }
-
-            continue;
+            dem++;
+            canhBao.ThemDuyNhat(KiemTraDongPhong.TaoCanhBao(dong, lyDo));
         }
 
-        //
-        if (dong.CheckinThucTe is null)
-        {
-            continue;
-        }
-
-        tong += ky.GioGiao(dong.CheckinThucTe.Value, DiemKetThuc(dong));
+        return dem;
     }
 
-    soDongLoai = loai;
-    return tong;
-}
+    // Tổng giờ phòng có khách giao với kỳ tháng.
+    // Dòng không hợp lệ hoặc chưa checkin bij bỏ qua
+    public double TinhGioCoKhach(KyThang ky)
+    {
+        var thoiDiemBaoCao = Nguon.ThoiDiemBaoCao;
+        var tong = 0d;
 
-    //
+        foreach (var dong in Nguon.TatCaDong())
+        {
+            if (KiemTraDongPhong.LyDoKhongHopLe(dong, thoiDiemBaoCao) is not null)
+            {
+                continue;
+            }
+
+            if (dong.CheckinThucTe is null)
+            {
+                continue;
+            }
+
+            tong += ky.GioGiao(dong.CheckinThucTe.Value, DiemKetThuc(dong));
+        }
+        return tong;
+    }
+    
+    // mau so = so phong * so gio thuc te cua thang
     public double tinhGioDanhNghia(KyThang ky) => Nguon.Phongs.Count * ky.SoGio;
     
-    //
+    // dong chua checkout thi tinh den thoi diem bao cao
     public DateTime DiemKetThuc(ChiTietDatPhong dong) => dong.CheckoutThucTe ?? Nguon.ThoiDiemBaoCao;
     
-    ///
-    ///
     public double? TinhMucThamChieu(List<CanhBao> canhBao)
     {
         var nhan = Nguon.CauHinh.GioNhanChuan;
@@ -152,20 +159,20 @@ public sealed class TinhCongSuat
             if (thang.CongSuat is { } cs && cs > nguong)
             {
                 ds.Add(new CanhBao(LoaiCanhBao.CongSuatVuot100,
-                    $"thang {}: cong suat {cs:F1}% vuot 100%, can kiem tra khoang o chong nhau hoac danh muc phong; so lieu khong bi cat ve 1000%"));
+                    $"thang {thang.Thang}: cong suat {cs:F1}% vuot 100%, can kiem tra khoang o chong nhau hoac danh muc phong; so lieu khong bi cat ve 1000%"));
             }
         }
 
-        if (ketQua.CongSuatNam is { } nam && nam > nguong)
+        if (ketQua.CongSuatNam is { } csNam && csNam > nguong)
         {
-            ds.Add(new CanhBao(LoaiCanhBao.CongSuatVuot100, $"cong suat ca nam{nam:F1}% vuot 100%."));
+            ds.Add(new CanhBao(LoaiCanhBao.CongSuatVuot100, $"cong suat ca nam{csNam:F1}% vuot 100%."));
         }
 
         return ds;
     }
 
-    //
-        public void PhatHienChongNhau(int nam List<CanhBao> canhBao)
+    // hai dong cung phong co khoang o giao nhau
+        public void PhatHienChongNhau(int nam, List<CanhBao> canhBao)
         {
             var thoiDiemBaoCao = Nguon.ThoiDiemBaoCao;
             var theoPhong = Nguon.TatCaDong()
@@ -176,43 +183,31 @@ public sealed class TinhCongSuat
             {
                 var ds = nhom.OrderBy(d => d.CheckinThucTe!.Value).ToList();
                 ChiTietDatPhong? dongKetThucMuonNhat = null;
-                var KetThucMuonNhat = DateTime.MinValue;
+                var ketThucMuonNhat = DateTime.MinValue;
 
                 foreach (var dong in ds)
                 {
                     var vao = dong.CheckinThucTe!.Value;
-                    if (dongKetThucMuonNhat is not null && vao < KetThucMuonNhat 
+                    if (dongKetThucMuonNhat is not null && vao < ketThucMuonNhat 
                     && KiemTraDongPhong.LienQuanDenNam(dong, nam, thoiDiemBaoCao))
                     {
                         canhBao.ThemDuyNhat(new CanhBao(LoaiCanhBao.KhoangOChongNhau,
-                            $"phong #{nhom.Key}: dong #{dong.Id} co khoang ow giao nhau voiw dong #{dongKetThucMuonNhat.Id}", dong.Id));
+                            $"phong #{nhom.Key}: dong #{dong.Id} co khoang o giao nhau voi dong #{dongKetThucMuonNhat.Id}", dong.Id));
                     }
 
                     var ra = DiemKetThuc(dong);
-                    if (ra > KetThucMuonNhat)
+                    if (ra > ketThucMuonNhat)
                     {
-                        KetThucMuonNhat = ra;
+                        ketThucMuonNhat = ra;
                         dongKetThucMuonNhat = dong;
                     }
                 }
             }
         }
         
-public static bool TrongNgay(TimeSpan gio) => gio >= TimeSpan.Zero && gio < TimeSpan.FromDays(24);
-    
-    private static double> LamTronHienThi(double? giaTri)
-        => giaTri is null ? null : Math.Round(giaTri.Value, 1, MidpointRounding.AwayFromZero);
-    
+public static bool TrongNgay(TimeSpan gio) => gio >= TimeSpan.Zero && gio < TimeSpan.FromDays(1);
+
+private static double? LamTronHienThi(double? giaTri)
+    => giaTri.HasValue ? Math.Round(giaTri.Value, 1, MidpointRounding.AwayFromZero) : null;
+
 }
-
-
-
-
-
-
-
-
-
-
-
-

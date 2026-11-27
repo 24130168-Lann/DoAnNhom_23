@@ -7,7 +7,7 @@ public enum LoaiCanhBao
     KhoangOChongNhau,
     CongSuatVuot100,
     TienPhongKhongKhop,
-    TienDichjVuKhongKhop,
+    TienDichVuKhongKhop,
     TienCocKhongHopLe,
     ThieuMocThoiGianHuy,
     TrungNguonCoc,

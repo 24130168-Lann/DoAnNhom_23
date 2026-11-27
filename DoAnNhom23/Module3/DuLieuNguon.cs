@@ -7,23 +7,23 @@
 /// </summary>
 public sealed class DuLieuNguon
 {
-    public DuLieuNguon(DateTime thoiDiemBaoCao, IEnumerable<Phong> phongs, IEnumerable<DatPhong> datPhongs,
-        CauHinh? cauHinh)
+    public DuLieuNguon(DateTime thoiDiemBaoCao, IEnumerable<Phong> phongs, 
+        IEnumerable<DatPhong> datPhongs, CauHinh? cauHinh)
     {
         ArgumentNullException.ThrowIfNull(phongs);
         ArgumentNullException.ThrowIfNull(datPhongs);
-        thoiDiemBaoCao = thoiDiemBaoCao;
+        ThoiDiemBaoCao = thoiDiemBaoCao;
         Phongs = phongs.ToList().AsReadOnly();
-        DatPhong = datPhongs.ToList().AsReadOnly();
+        DatPhongs = datPhongs.ToList().AsReadOnly();
         CauHinh = cauHinh ?? new CauHinh();
 
     }
 
     public DateTime ThoiDiemBaoCao { get; }
     public IReadOnlyList<Phong> Phongs { get; }
-    public IReadOnlyList<DatPhong> DatPhong { get; }
+    public IReadOnlyList<DatPhong> DatPhongs { get; }
     public CauHinh CauHinh { get; }
     
     //
-    public IEnumerable<ChiTietDatPhong> TatCaDong() => DatPhong.SelectMany(d => d.CacDong);
+    public IEnumerable<ChiTietDatPhong> TatCaDong() => DatPhongs.SelectMany(d => d.CacDong);
 }
