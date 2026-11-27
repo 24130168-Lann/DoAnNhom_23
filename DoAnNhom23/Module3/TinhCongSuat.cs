@@ -17,7 +17,7 @@ public sealed class TinhCongSuat
         var thoiDiemBaoCao = Nguon.ThoiDiemBaoCao;
         if (!KiemTraDauVao.NamHopLe(nam, thoiDiemBaoCao))
         {
-            throw new ArgumentOutOfRangeException(nameof(nam), nam, "nam phai tu 200 den nam hien.");
+            throw new ArgumentOutOfRangeException(nameof(nam), nam, "nam phai tu 2000 den nam hien tai.");
         }
 
         var canhBao = new List<CanhBao>();
@@ -25,12 +25,13 @@ public sealed class TinhCongSuat
         var cacThang = new List<KetQuaCongSuatThang>(12);
         var tongGioKhach = 0d;
         var tongGioDanhNghia = 0d;
+        var soDongLoai = DemDongBiLoai(nam, canhBao);
 
         foreach (var ky in KyThang.TaoCacThang(nam, thoiDiemBaoCao))
         {
             if (!ky.DaBatDau)
             {
-                //
+                // thang tuong lai: de trong, khong hien thi
                 cacThang.Add(new KetQuaCongSuatThang { Thang = ky.Thang, TrangThai = TrangThaiThang.ChuaBatDau });
                 continue;
             }
@@ -38,7 +39,7 @@ public sealed class TinhCongSuat
             var gioCoKhach = TinhGioCoKhach(ky);
             var gioDanhNghia = TinhGioDanhNghia(ky);
 
-            // 
+            // mau so = 0(vua dung 0h 00 dau thang, hoặc khong co phong) -> null, khong chia 0
             double? congSuat = gioDanhNghia > 0d ? gioCoKhach / gioDanhNghia * 100d : null;
 
             cacThang.Add(new KetQuaCongSuatThang
@@ -129,7 +130,7 @@ public sealed class TinhCongSuat
     }
     
     // mau so = so phong * so gio thuc te cua thang
-    public double tinhGioDanhNghia(KyThang ky) => Nguon.Phongs.Count * ky.SoGio;
+    public double TinhGioDanhNghia(KyThang ky) => Nguon.Phongs.Count * ky.SoGio;
     
     // dong chua checkout thi tinh den thoi diem bao cao
     public DateTime DiemKetThuc(ChiTietDatPhong dong) => dong.CheckoutThucTe ?? Nguon.ThoiDiemBaoCao;

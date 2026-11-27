@@ -5,7 +5,7 @@
 public sealed class DatPhong
 {
     public int Id { get; init; }
-    private TrangThaiDatPhong TrangThai { get; init; }
+    public TrangThaiDatPhong TrangThai { get; init; }
     public long TienCoc { get; init; }
     public DateTime? ThoiDiemCoc{ get; init; }
     public long TienCocHoan { get; init; }

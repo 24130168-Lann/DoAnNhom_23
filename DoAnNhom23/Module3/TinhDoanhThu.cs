@@ -44,7 +44,7 @@ public sealed class TinhDoanhThu
                 continue;
             }
 
-            var phanBo = PhanBoTienPhong(dong);
+            var phanBo = phanBoTienPhong(dong);
             var trongNam = phanBo.Where(x => x.Nam == nam).ToList();
             foreach (var khoan in trongNam)
             {
@@ -138,7 +138,7 @@ public sealed class TinhDoanhThu
                 return 0;
             }
 
-            var doDem = (dong.CheckoutThucTe!.Value.Date - dong.CheckinThucTe!.Value.Date).Days;
+            var soDem = (dong.CheckoutThucTe!.Value.Date - dong.CheckinThucTe!.Value.Date).Days;
             return Math.Max(0, soDem);
         }
 
@@ -246,7 +246,7 @@ public sealed class TinhDoanhThu
             => Nguon.TatCaDong().Where(d =>
                 d.DaCheckout && KiemTraDongPhong.LyDoKhongHopLe(d, Nguon.ThoiDiemBaoCao) is null);
 
-        private static bool DichVuHopLe(ChiTietDatPhong dv) 
+        private static bool DichVuHopLe(ChiTietDichVu dv) 
             => !dv.DaXoa && dv.SoLuong > 0 && dv.DonGia >= 0;
     }
 
