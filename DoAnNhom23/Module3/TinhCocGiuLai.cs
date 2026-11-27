@@ -1,11 +1,4 @@
 ﻿namespace khachSan;
-
-/// <summary>
-/// Coc giu lai theo thang
-/// Hai nguon loai tru nhau, khong bao gio cong trung
-/// 1, huy toan bo - cap DAT_PHONG, theo thoi diem huy;
-/// 2, noshow tung dung - cap CHI-TIET-DAT-PHONG, theo huy luc
-/// </summary>
 public sealed class TinhCocGiuLai
 {
 
@@ -15,15 +8,16 @@ public sealed class TinhCocGiuLai
    {
       Nguon = nguon ?? throw new ArgumentNullException(nameof(nguon));
    }
-
+/// <summary>
+/// tổng cọc giữ lại trong tháng = hủy toàn bộ  + noshow từng dòng
+/// </summary>
    public long TinhThang(KyThang ky, List<CanhBao> canhBao)
    => TinhCocHuyToanBo(ky, canhBao) + TinhCocNoShow(ky,  canhBao);
+
    /// <summary>
-   /// 
+   /// DT-09: DAT_PHONG ở DA-Huy dã thu cọc(thoi_diem_coc khác NULL): giữ = tien_coc - tien_coc_hoan,
+   /// thuộc tháng thoi_diem_huy. Chua thu cọc thì bằng 0 dù tieen_coc có giá trị dự kiến
    /// </summary>
-   /// <param name="ky"></param>
-   /// <param name="canhBao"></param>
-   /// <returns></returns>
    public long TinhCocHuyToanBo(KyThang ky, List<CanhBao> canhBao)
    {
       long tong = 0;
@@ -48,14 +42,16 @@ public sealed class TinhCocGiuLai
    }
 
    /// <summary>
-   /// 
+   /// tổng cọc giu lai (module 1 đã tính) của dòng co huy_luc,
+   /// thuộc đặt phòng đã thu cọc v đang DANG_O hoặc đã DA_TRA; thuộc tháng chưa huy_luc.
+   /// Koong cộng thêm tien_coc - tien_coc_hoan(DT-11)
    /// </summary>
    /// <param name="ky"></param>
    /// <param name="canhBao"></param>
    public long TinhCocNoShow(KyThang ky, List<CanhBao> canhBao)
    {
       long tong = 0;
-      foreach (var dp in Nguon.DatPhong)
+      foreach (var dp in Nguon.DatPhongs)
       {
          if (!DatPhongDuocXet(dp, ky, canhBao))
          {
@@ -80,7 +76,7 @@ public sealed class TinhCocGiuLai
    }
 
    /// <summary>
-   /// 
+   /// đặt phòng DA_HUY mà đồng thời có dòng mang huy_luc: 2 nhánh loại tr bị vi pham(DT_11)
    /// </summary>
    /// <param name="dp"></param>
    /// <returns></returns>
@@ -88,7 +84,7 @@ public sealed class TinhCocGiuLai
       => dp.TrangThai == TrangThaiDatPhong.DaHuy && dp.CacDong.Any(d => d.HuyLuc is not null);
 
    /// <summary>
-   /// 
+   /// Kiểm tra bất biến cọc/mốc thời gian của một đặt phòng(mục 7 và 11.3). Danh sách rỗng = hợp lệ
    /// </summary>
    /// <param name="dp"></param>
    /// <returns></returns>
@@ -97,7 +93,7 @@ public sealed class TinhCocGiuLai
       var ds = new List<CanhBao>();
       var nhan = $"Dat phong #{dp.Id}";
 
-      if (dp.TienCoc < 0 || dp.TienCoc < 0)
+      if (dp.TienCoc < 0 || dp.TienCocHoan < 0)
       {
          ds.Add(new CanhBao(LoaiCanhBao.TienCocKhongHopLe, $"{nhan}: tien coc hoac tien coc hoan am.", dp.Id));
       }
@@ -127,7 +123,7 @@ public sealed class TinhCocGiuLai
          }
          else if (dp.ThoiDiemCoc > dp.ThoiDiemHuy)
          {
-            ds.Add(new CanhBao(LoaiCanhBao.ThieuMocThoiGianHuy, $"{nhan}: thoi diem coc sau thoi diem suy.", dp.Id));
+            ds.Add(new CanhBao(LoaiCanhBao.ThieuMocThoiGianHuy, $"{nhan}: thoi diem coc sau thoi diem huy.", dp.Id));
          }
       }
 
@@ -157,12 +153,12 @@ public sealed class TinhCocGiuLai
             }
             else if (dp.ThoiDiemCoc > huyLuc)
             {
-               ds.Add(new CanhBao(LoaiCanhBao.ThieuMocThoiGianHuy, $"dong phong #{dong.Id}: thoi diem coc sau hoan luc.", dong.Id));
+               ds.Add(new CanhBao(LoaiCanhBao.ThieuMocThoiGianHuy, $"dong phong #{dong.Id}: thoi diem coc sau huy luc.", dong.Id));
             }
 
             if (dong.CheckinThucTe is not null)
             {
-               ds.Add(KiemTraDongPhong.TaoCanhBao(dong, "dong co huy luc(noshow) nhung dong thoi co checkin thuc te."));
+               ds.Add(KiemTraDongPhong.TaoCanhBao(dong, "Dong co huy luc(noshow) nhung dong thoi co checkin thuc te."));
             }
          }
       }
@@ -171,7 +167,9 @@ public sealed class TinhCocGiuLai
    }
 
    /// <summary>
-   /// 
+   /// ặt phòng có được đưa vào phép tính của kỳ này không: phải liên quan tới kỳ(hoặc thiếu mốc nên không biết thuoo kì nào)
+   /// và không vi phạm bất biến.
+   /// Nếu vi phạm/; ghi cảnh báo và loại cả đặt phòng, không gán khoản vào tháng tùy tiện
    /// </summary>
    /// <param name="dp"></param>
    /// <param name="ky"></param>
@@ -199,7 +197,7 @@ public sealed class TinhCocGiuLai
          return true;
       }
 
-      if (dp.ThoiDiemHuy is { } huy && ky.Chua(huy)) ;
+      if (dp.ThoiDiemHuy is { } huy && ky.Chua(huy))
       {
          return true;
       }

@@ -1,23 +1,25 @@
 ﻿namespace khachSan;
-
+/// <summary>
+/// Bảng CHI_TIET_DAT_PHONG (một dòng phòng của một đặt phòng)
+/// </summary>
 public sealed class ChiTietDatPhong
 {
-    public int Id { get; set; }
-    public int DatPhongId { get; set; }
-    public int PhongId { get; set; }
-    public DateTime? CheckinThucTe { get; set; }
-    public DateTime? CheckoutThucTe { get; set; }
-    public decimal GiaMoiDem{get; set;}
-    public decimal TienPhong{get; set;}
-    public decimal TienDichVu{get; set;}
+    public int Id { get; init; }
+    public int DatPhongId { get; init; }
+    public int PhongId { get; init; }
+    public DateTime? CheckinThucTe { get; init; }
+    public DateTime? CheckoutThucTe { get; init; }
+    public long GiaMoiDem{get; init;}
+    public long TienPhong{get; init;}
+    public long TienDichVu{get; init;}
     
     // Thoi diem xac nhan no-show cua rieng dong nay
-    public DateTime? HuyLuc{get; set;}
+    public DateTime? HuyLuc{get; init;}
     
     // Coc giu lai cua dong no-show doModele1 da tinh va luu(ko tinh lai)
-    public decimal CocGiuLai{get; set;}
+    public long CocGiuLai{get; init;}
 
-    public List<ChiTietDichVu> DichVus { get; set; } = new();
+    public List<ChiTietDichVu> DichVus { get; init; } = new();
     
     public bool DaCheckin => CheckinThucTe.HasValue;
     

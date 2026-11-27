@@ -18,7 +18,7 @@ public sealed class TinhDoanhThu
         var thoiDiemBaoCao = Nguon.ThoiDiemBaoCao;
         if (!KiemTraDauVao.NamHopLe(nam, thoiDiemBaoCao))
         {
-            throw new ArgumentOutOfRangeException(nameof(nam), nam, "nam phai tu 200 den nam hien.");
+            throw new ArgumentOutOfRangeException(nameof(nam), nam, "nam phai tu 2000 den nam hien tai.");
         }
 
         var canhBao = new List<CanhBao>();
@@ -38,13 +38,13 @@ public sealed class TinhDoanhThu
                 continue;
             }
 
-            //
+            // chua tra phong thi chua ghi nhan doanh thu
             if (!dong.DaCheckout)
             {
                 continue;
             }
 
-            var phanBo = PhanBoTienPhong(dong);
+            var phanBo = phanBoTienPhong(dong);
             var trongNam = phanBo.Where(x => x.Nam == nam).ToList();
             foreach (var khoan in trongNam)
             {
@@ -60,8 +60,8 @@ public sealed class TinhDoanhThu
                 }
             }
 
-            var lienQuanDichVu = dong.CheckoutThucTe!.Value == nam ||
-                dong.DichVus.Any((dv => thoiDiemBaoCao.Year == nam));
+            var lienQuanDichVu = dong.CheckoutThucTe!.Value.Year == nam ||
+                dong.DichVus.Any((dv => dv.ThoiDiem.Year == nam));
             if (lienQuanDichVu)
             {
                 var cbDichVu = KiemTraKhopTienDichVu(dong);
@@ -102,7 +102,7 @@ public sealed class TinhDoanhThu
             });
 
             tongPhong += phong;
-            tongPhong += dichVu;
+            tongDichVu += dichVu;
             tongCoc += coc;
         }
 
@@ -138,12 +138,13 @@ public sealed class TinhDoanhThu
                 return 0;
             }
 
-            var doDem = dong.CheckoutThucTe!.Value.Date - dong.CheckinThucTe!.Value.Date).Days;
+            var soDem = (dong.CheckoutThucTe!.Value.Date - dong.CheckinThucTe!.Value.Date).Days;
             return Math.Max(0, soDem);
         }
 
         /// <summary>
-        /// 
+        /// Moi dem tinh vao thang cua ngay bat dau dem
+        /// phan ngoai tien dem(phu thu, tra muon..) tinh vao thang checkout
         /// </summary>
         /// <param name="dong"></param>
         /// <returns></returns>
@@ -172,12 +173,11 @@ public sealed class TinhDoanhThu
 
             return ds;
         }
-
-        //
+        
         public long TinhPhanNgoaiTienDem(ChiTietDatPhong dong)
             => dong.TienPhong - (long)TinhSoDem(dong) * dong.GiaMoiDem;
         
-        //
+        // doanh thu dich vu tinh theo thang cua thoi diem su dyng dich vu, chi voi dong da tra hop le
         public long TinhDoanhThuDichVu(KyThang ky)
         {
             long tong = 0;
@@ -195,21 +195,20 @@ public sealed class TinhDoanhThu
 
             return tong;
         }
-
-        //
+        
         public CanhBao? KiemTraKhopTienPhong(ChiTietDatPhong dong, List<KhoanPhanBo> phanBo)
         {
             if (dong.TienPhong < 0 || dong.GiaMoiDem < 0)
             {
-                return new CanhBao(LoaiCanhBao.TienPhongKhongKhop, $"dong phong {dong.Id}: tien phong hoac gia moi dem am.",
-                    dong.Id);
+                return new CanhBao(LoaiCanhBao.TienPhongKhongKhop, 
+                    $"dong phong #{dong.Id}: tien phong hoac gia moi dem am.", dong.Id);
             }
 
             var phanNgoai = TinhPhanNgoaiTienDem(dong);
             if (phanNgoai < 0)
             {
                 return new CanhBao(LoaiCanhBao.TienPhongKhongKhop,
-                    $"dong phong #{dong.Id}: phan tien ngoai tien am({phanNgoai:NO}d) tien phong nhi hon so dem * gia moi dem",
+                    $"dong phong #{dong.Id}: phan tien ngoai tien am ({phanNgoai:NO}d) tien phong nhi hon so dem * gia moi dem",
                     dong.Id);
             }
 
@@ -227,7 +226,7 @@ public sealed class TinhDoanhThu
             var dichVuSai = dong.DichVus.FirstOrDefault(dv => !dv.DaXoa && !DichVuHopLe(dv));
             if (dichVuSai is not null)
             {
-                return new CanhBao(LoaiCanhBao.TienPhongKhongKhop,
+                return new CanhBao(LoaiCanhBao.TienDichVuKhongKhop,
                     $"dong phong %{dong.Id}: dich vu #{dichVuSai.Id} co so luong hoac don giakhong hop le.", dong.Id);
             }
 
@@ -235,8 +234,8 @@ public sealed class TinhDoanhThu
             if (dong.TienDichVu < 0 || tongDichVu != dong.TienDichVu)
             {
                 return new CanhBao(
-                LoaiCanhBao.TienDichjVuKhongKhop,
-                $"dong phong %{dong.Id}: dtien dich vu da chot ({dong.TienDichVu}d) khong khop tong dich vu chua xoa({tongDichVu:NO}d).", 
+                LoaiCanhBao.TienDichVuKhongKhop,
+                $"dong phong #{dong.Id}: tien dich vu da chot ({dong.TienDichVu}d) khong khop tong dich vu chua xoa({tongDichVu:NO}d).", 
                 dong.Id);
             }
 
@@ -247,7 +246,7 @@ public sealed class TinhDoanhThu
             => Nguon.TatCaDong().Where(d =>
                 d.DaCheckout && KiemTraDongPhong.LyDoKhongHopLe(d, Nguon.ThoiDiemBaoCao) is null);
 
-        private static bool DichVuHopLe(ChiTietDatPhong dv) 
+        private static bool DichVuHopLe(ChiTietDichVu dv) 
             => !dv.DaXoa && dv.SoLuong > 0 && dv.DonGia >= 0;
     }
 

@@ -1,3 +1,4 @@
 ﻿namespace khachSan;
 
-public sealed record KhoanPhanBo(int Nam, int Thang, decimal SoTien, decimal LaTienDem);
+// một khoản tiền phòng được phân bổ vào một tháng
+public sealed record KhoanPhanBo(int Nam, int Thang, long SoTien, bool LaTienDem);
