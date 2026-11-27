@@ -45,6 +45,47 @@ public static class SoDoPhongService
 
 		return MauPhong.XANH;
 	}
+
+	public static SuatConLai TinhSuatConLai( 
+		long loaiPhongId,
+		KhoangThoiGian xem,
+		List<Phong> phongs,
+		List<DatPhong> datPhongs,
+		List<ChiTietDatPhong> chiTiets,
+		int thoiGianDonPhut,
+		DateTime now)
+	{
+		var phongTheoId = phongs.ToDictionary(p => p.Id);
+		var datTheoId = datPhongs.ToDictionary(d => d.Id);
+		int tongNgay = phongs.Count(p => p.LoaiPhongId == loaiPhongId && p.CheDo == CheDoPhong.THEO_NGAY);
+		var phongGio = phongs.Where(p => p.LoaiPhongId == loaiPhongId && p.CheDo == CheDoPhong.THEO_GIO).ToList();
+		
+		//quỹ theo ngày: số phòng bị giữ nhiều nhất trong khoảng xem
+		var chiem = new List<KhoangThoiGian>();
+		foreach (var d in chiTiets)
+		{
+			if (d.LoaiPhongId != loaiPhongId) continue;
+			if (d.PhongId != null && phongTheoId[d.PhongId.Value].CheDo == CheDoPhong.THEO_GIO) continue;
+
+			var k = KiemTraConPhongService.KhoangChiem(d, datTheoId[d.DatPhongId], thoiGianDonPhut);
+			if (k != null) chiem.Add(k);
+		}
+
+		var moc = new List<DateTime> { xem.Tu };
+		moc.AddRange(chiem.Where(k => k.Tu > xem.Tu && k.Tu < xem.Den).Select(k => k.Tu));
+		int giuNhieuNhat = moc.Max(t => chiem.Count(k => k.Tu <= t && t < k.Den));
+		
+		//quỹ theo giờ: só phòng trống thực tế tại thời điểm xem
+		int trongGio = phongGio.Count(p => KiemTraConPhongService.PhongTrongThucTe(p, chiTiets, now));
+		return new SuatConLai
+		{
+			LoaiPhongId = loaiPhongId,
+			TongTheoNgay = tongNgay,
+			ConTheoNgay = Math.Max(0, tongNgay - giuNhieuNhat),
+			TongTheoGio = phongGio.Count,
+			ConTheoGio = trongGio
+		};
+	}
 		
 			
 	
