@@ -1,4 +1,4 @@
-namespace DoAnNhom23.Module1.Results;
+namespace DoAnNhom23.Module1.Models;
 
 public class KhoangThoiGian
 {

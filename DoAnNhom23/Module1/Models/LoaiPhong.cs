@@ -1,4 +1,4 @@
-﻿namespace DoAnNhom23.Models;
+﻿namespace DoAnNhom23.Module1.Models;
 
 public class LoaiPhong
 {

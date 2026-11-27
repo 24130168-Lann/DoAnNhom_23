@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace DoAnNhom23;
+namespace DoAnNhom23.Module1.Models;
 
 public class KhachHang
 {

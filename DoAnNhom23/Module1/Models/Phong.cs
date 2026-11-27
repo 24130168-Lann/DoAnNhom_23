@@ -2,7 +2,7 @@
 using System.Reflection.Metadata;
 using Microsoft.Win32.SafeHandles;
 
-namespace DoAnNhom23;
+namespace DoAnNhom23.Module1.Models;
 //bảng PHONG
 public class Phong
 {

@@ -1,5 +1,6 @@
 using Microsoft.Data.Sqlite;
 using DoAnNhom23.Data;
+using DoAnNhom23.Module1.Models;
 namespace DoAnNhom23.Module1.Repositories;
 
 

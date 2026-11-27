@@ -1,4 +1,4 @@
-namespace DoAnNhom23;
+namespace DoAnNhom23.Module1.Models;
 //Nguyễn Thị Hoài Lan
 //một phòng trong 1 đặt phòng (dòng phòng)
 public class ChiTietDatPhong

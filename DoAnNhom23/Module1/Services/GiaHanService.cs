@@ -1,4 +1,4 @@
-namespace DoAnNhom23.Services;
+namespace DoAnNhom23.Module1.Services;
 
 public class GiaHanService
 {

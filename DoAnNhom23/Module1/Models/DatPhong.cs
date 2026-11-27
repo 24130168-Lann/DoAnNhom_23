@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-namespace DoAnNhom23;
+namespace DoAnNhom23.Module1.Models;
 public class DatPhong
 {
     //một lần giữ chỗ gồm 1 hoặc là nhiều phòng
