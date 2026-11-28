@@ -1,6 +1,6 @@
-using System.Runtime.InteropServices;
+
 using Microsoft.Data.Sqlite;
-using DoAnNhom23.Data;
+
 namespace DoAnNhom23.Module1.Repositories;
 
 public class CauHinhRepository
@@ -20,5 +20,7 @@ public class CauHinhRepository
     
     //các tham số hay dùng
     public static int ThoiGianDonPhut(SqliteConnection conn) => LayInt(conn, "thoi_gian_don_phut");
-    public static int ThoiGianCocPhut(SqliteConnection conn) =>  LayInt(conn, "thoi_gian_coc_phut");
+    public static int ThoiHanCocPhut(SqliteConnection conn) => LayInt(conn, "thoi_han_coc_phut");
+    public static int SoDemCoc(SqliteConnection conn) => LayInt(conn, "so_dem_coc");
+    
 }

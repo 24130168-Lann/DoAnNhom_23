@@ -17,9 +17,10 @@ public class DatPhongRepository
         var ds = new List<DatPhong>();
         while (r.Read()) ds.Add(DocMotDong(r));
         return ds;
-        
-            
-        }
+
+
+    }
+
     //tách riêng để các hàm tìm kiếm sau này dừng lại
     internal static DatPhong DocMotDong(SqliteDataReader r) => new DatPhong
     {
@@ -44,5 +45,38 @@ public class DatPhongRepository
         TkHoanNganHang = r.ChuoiNull("tk_hoan_ngan_hang"),
         NoiDungHoanCoc = r.ChuoiNull("noi_dung_hoan_coc")
     };
+
+    public static long Them(SqliteConnection conn, DatPhong d)
+    {
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = @"INSERT INTO DAT_PHONG
+        (ma_dat_phong, khach_hang_id, la_vang_lai, ngay_den, ngay_di, tien_coc,
+         han_thanh_toan_coc, thoi_diem_coc, trang_thai, tk_hoan_ten, tk_hoan_so, tk_hoan_ngan_hang)
+        VALUES ($ma, $kh, $vl, $den, $di, $coc, $han, $tdc, $tt, $tkten, $tkso, $tkbank);
+        SELECT last_insert_rowid();";
+        cmd.Them("$ma", d.MaDatPhong);
+        cmd.Them("$kh", d.KhachHangId);
+        cmd.Them("$vl", d.LaVangLai ? 1 : 0);
+        cmd.ThemGio("$den", d.NgayDen);
+        cmd.ThemGio("$di", d.NgayDi);
+        cmd.Them("$coc", d.TienCoc);
+        cmd.ThemGio("$han", d.HanThanhToanCoc);
+        cmd.ThemGio("$tdc", d.ThoiDiemCoc);
+        cmd.Them("$tt", d.TrangThai.ToString());
+        cmd.Them("$tkten", d.TkHoanTen);
+        cmd.Them("$tkso", d.TkHoanSo);
+        cmd.Them("$tkbank", d.TkHoanNganHang);
+        return (long)cmd.ExecuteScalar()!;
+    }
+    //hàm kiểm tra cp15 mỗi số điện thoại chỉ có 1 đặt phòng chờ cọc
+    public static bool CoChoCocTheoSdt(SqliteConnection conn, string soDienThoai)
+    {
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = @"SELECT COUNT(*) FROM DAT_PHONG d
+        JOIN KHACH_HANG k ON k.id = d.khach_hang_id
+        WHERE d.trang_thai = 'CHO_COC' AND k.so_dien_thoai = $sdt";
+        cmd.Them("$sdt", soDienThoai);
+        return (long)cmd.ExecuteScalar()! > 0;
+    }
 
 }

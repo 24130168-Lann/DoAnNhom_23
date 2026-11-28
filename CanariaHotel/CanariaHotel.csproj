@@ -17,5 +17,11 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Compile>
     </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\DoAnNhom23\DoAnNhom23.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <None Include="..\DoAnNhom23\Data\*.sql" Link="Data\%(Filename)%(Extension)" CopyToOutputDirectory="Always" />
+    </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-namespace DoAnNhom23.Module1.Models;
+namespace DoAnNhom23.Module1.Results;
 
 public class KetQuaKiemTra
 {

@@ -37,4 +37,20 @@ public class ChiTietDatPhongRepository
        CocGiuLai  = r.Long("coc_giu_lai"),
     };
 
+    public static long Them(SqliteConnection conn, ChiTietDatPhong c)
+    {
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = @"INSERT INTO CHI_TIET_DAT_PHONG
+        (dat_phong_id, loai_phong_id, phong_id, gia_moi_dem, gia_moi_gio, checkin_thuc_te)
+        VALUES ($dp, $lp, $ph, $gd, $gg, $ci);
+        SELECT last_insert_rowid();";
+        cmd.Them("$dp", c.DatPhongId);
+        cmd.Them("$lp", c.LoaiPhongId);
+        cmd.Them("$ph", c.PhongId);
+        cmd.Them("$gd", c.GiaMoiDem);
+        cmd.Them("$gg", c.GiaMoiGio);
+        cmd.ThemGio("$ci", c.CheckinThucTe);
+        return (long)cmd.ExecuteScalar()!;
+    }
+
 }

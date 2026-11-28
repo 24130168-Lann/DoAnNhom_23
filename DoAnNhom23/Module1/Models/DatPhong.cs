@@ -5,7 +5,7 @@ public class DatPhong
     //một lần giữ chỗ gồm 1 hoặc là nhiều phòng
     public long Id  { get; set; }
     public string MaDatPhong { get; set; } = string.Empty;
-    public KhachHang KhachHangId { get; set; }
+    public long KhachHangId { get; set; }
     //khách vãng lai: tạo và check-in cùng lúc, không đặt cọc
     public bool LaVangLai { get; set; }
     //thời gian dự kiến
