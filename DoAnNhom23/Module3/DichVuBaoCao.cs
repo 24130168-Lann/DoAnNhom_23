@@ -30,7 +30,7 @@ public sealed class DichVuBaoCao
     }
     private DateTime ChuanBi(VaiTro vaiTro, int nam)
     {
-        if (vaiTro != VaiTro.CHU)
+        if (vaiTro != VaiTro.Chu)
         {
             throw new UnauthorizedAccessException("Chi tai khoan chu moiws duoc xem bao cao");
         }

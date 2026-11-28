@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net10.0-windows</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UseWindowsForms>true</UseWindowsForms>
+        <RootNamespace>khachSan</RootNamespace>
+        <NoWarn>$(NoWarn);WFO1000</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.0" />
+    </ItemGroup>
+
+    <!-- schema.sql và data.sql được copy ra thư mục Data cạnh file .exe để Db.KhoiTao() chạy -->
+    <ItemGroup>
+        <None Update="Data\schema.sql" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Data\data.sql" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+
+</Project>

@@ -1,6 +1,4 @@
-﻿using System.Reflection.Metadata.Ecma335;
-
-namespace khachSan;
+﻿namespace khachSan;
 
 public sealed class TinhDoanhThu
 {

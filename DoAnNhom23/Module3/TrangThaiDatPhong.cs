@@ -3,6 +3,7 @@
 public enum TrangThaiDatPhong
 {
     ChoCoc,
+    DaDat,
     DangO,
     DaTra,
     DaHuy
