@@ -17,7 +17,8 @@ public sealed class KetQuaDoanhThu
 {
     public int Nam { get;init; }
     public DateTime ThoiDiemBaoCao {get;init;}
-    public List<KetQuaDoanhThuThang> CacThang {get;init;}
+
+    public List<KetQuaDoanhThuThang> CacThang { get; init; } = new();
     // Dong tong nam = tong cac thang da bat dau
     public KetQuaDoanhThuThang TongNam { get; init; } = new();
     public List<CanhBao> CanhBaos { get; init; } = new();

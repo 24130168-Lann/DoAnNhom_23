@@ -208,7 +208,7 @@ public sealed class TinhDoanhThu
             if (phanNgoai < 0)
             {
                 return new CanhBao(LoaiCanhBao.TienPhongKhongKhop,
-                    $"dong phong #{dong.Id}: phan tien ngoai tien am ({phanNgoai:NO}d) tien phong nhi hon so dem * gia moi dem",
+                    $"dong phong #{dong.Id}: phan tien ngoai tien am ({phanNgoai:N0}d) tien phong nhi hon so dem * gia moi dem",
                     dong.Id);
             }
 
@@ -227,7 +227,7 @@ public sealed class TinhDoanhThu
             if (dichVuSai is not null)
             {
                 return new CanhBao(LoaiCanhBao.TienDichVuKhongKhop,
-                    $"dong phong %{dong.Id}: dich vu #{dichVuSai.Id} co so luong hoac don giakhong hop le.", dong.Id);
+                    $"dong phong #{dong.Id}: dich vu #{dichVuSai.Id} co so luong hoac don giakhong hop le.", dong.Id);
             }
 
             var tongDichVu = dong.DichVus.Where(DichVuHopLe).Sum(dv => dv.ThanhTien);
@@ -235,7 +235,7 @@ public sealed class TinhDoanhThu
             {
                 return new CanhBao(
                 LoaiCanhBao.TienDichVuKhongKhop,
-                $"dong phong #{dong.Id}: tien dich vu da chot ({dong.TienDichVu}d) khong khop tong dich vu chua xoa({tongDichVu:NO}d).", 
+                $"dong phong #{dong.Id}: tien dich vu da chot ({dong.TienDichVu}d) khong khop tong dich vu chua xoa({tongDichVu:N0}d).", 
                 dong.Id);
             }
 

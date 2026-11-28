@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Reflection.Metadata.Ecma335;
-
-namespace khachSan;
+﻿namespace khachSan;
 
 public sealed class TinhCongSuat
 {
@@ -93,7 +90,7 @@ public sealed class TinhCongSuat
         foreach (var dong in Nguon.TatCaDong())
         {
             var lyDo = KiemTraDongPhong.LyDoKhongHopLe(dong, thoiDiemBaoCao);
-            if (lyDo is not null || !KiemTraDongPhong.LienQuanDenNam(dong, nam, thoiDiemBaoCao))
+            if (lyDo is null || !KiemTraDongPhong.LienQuanDenNam(dong, nam, thoiDiemBaoCao))
             { 
                 continue; 
             }
@@ -160,7 +157,7 @@ public sealed class TinhCongSuat
             if (thang.CongSuat is { } cs && cs > nguong)
             {
                 ds.Add(new CanhBao(LoaiCanhBao.CongSuatVuot100,
-                    $"thang {thang.Thang}: cong suat {cs:F1}% vuot 100%, can kiem tra khoang o chong nhau hoac danh muc phong; so lieu khong bi cat ve 1000%"));
+                    $"thang {thang.Thang}: cong suat {cs:F1}% vuot 100%, can kiem tra khoang o chong nhau hoac danh muc phong; so lieu khong bi cat ve 100%"));
             }
         }
 
