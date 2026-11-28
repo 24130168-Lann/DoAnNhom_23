@@ -2,7 +2,7 @@
 
 public enum VaiTro
 {
-    Khach,
-    NhanVien,
-    Chu,
+    KHACH,
+    NHAN_VIEN,
+    CHU,
 }
